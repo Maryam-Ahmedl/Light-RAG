@@ -1,0 +1,27 @@
+# Environment secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+venv/
+*.egg-info/
+
+# Generated storage (knowledge graph, vectors, KV store)
+storage_data/
+
+# Generated logs (query/ingest latency)
+logs/
+
+# Generated evaluation artifacts
+eval_dataset.json
+eval_questions.json
+ragas_results.csv
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

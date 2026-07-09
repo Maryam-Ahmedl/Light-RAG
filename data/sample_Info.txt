@@ -1,0 +1,49 @@
+Machine Learning Fundamentals: An Overview
+
+Introduction to Machine Learning
+
+Machine learning is a subfield of artificial intelligence that focuses on building systems that learn patterns from data rather than following explicitly programmed rules. Instead of hand-coding logic for every scenario, a machine learning model is trained on examples and learns to generalize from them. The three broad categories of machine learning are supervised learning, unsupervised learning, and reinforcement learning.
+
+In supervised learning, the model is trained on labeled data, meaning each training example comes with a known correct output. Common supervised learning tasks include classification, where the goal is to predict a discrete category, and regression, where the goal is to predict a continuous value. Popular supervised algorithms include linear regression, logistic regression, decision trees, random forests, support vector machines, and gradient boosted trees such as XGBoost and LightGBM.
+
+Unsupervised learning works with unlabeled data. The model tries to find structure or patterns without being told what the correct answer is. Clustering algorithms like k-means and DBSCAN group similar data points together. Dimensionality reduction techniques like principal component analysis (PCA) and t-SNE reduce the number of features while preserving important structure in the data.
+
+Reinforcement learning involves an agent that learns to make decisions by interacting with an environment and receiving rewards or penalties. The agent's goal is to learn a policy that maximizes cumulative reward over time. Reinforcement learning has been used successfully in game playing, robotics, and resource management.
+
+Neural Networks and Deep Learning
+
+A neural network is a computational model inspired loosely by the structure of biological neurons. It consists of layers of interconnected nodes, or neurons, where each connection has an associated weight. Data passes through the network in a forward pass, and the network's predictions are compared against the true labels using a loss function. The error is then propagated backward through the network using backpropagation, and the weights are updated using an optimization algorithm such as stochastic gradient descent or Adam.
+
+Deep learning refers to neural networks with many layers, allowing them to learn increasingly abstract representations of data. Convolutional neural networks (CNNs) are especially effective for image data because they use convolutional filters to detect spatial patterns like edges, textures, and shapes. Recurrent neural networks (RNNs) and their variants, such as long short-term memory networks (LSTMs), were historically used for sequential data like text and time series, though they have largely been superseded by transformer architectures for most language tasks.
+
+Transformers and Large Language Models
+
+The transformer architecture, introduced in 2017, relies on a mechanism called self-attention, which allows the model to weigh the importance of different tokens in a sequence relative to one another. Unlike RNNs, transformers process entire sequences in parallel rather than step by step, which makes them far more efficient to train on modern hardware. Transformers form the backbone of most modern large language models (LLMs), including models used for text generation, translation, and question answering.
+
+Large language models are typically pretrained on massive text corpora using a self-supervised objective, such as predicting the next token in a sequence. After pretraining, models are often fine-tuned on smaller, task-specific datasets, or aligned using techniques like reinforcement learning from human feedback (RLHF) to make their outputs more helpful and safe.
+
+Embeddings and Vector Representations
+
+An embedding is a dense vector representation of data, such as words, sentences, or images, in a continuous vector space. Similar items are mapped to nearby points in this space, which allows embeddings to capture semantic relationships. Word embeddings like Word2Vec and GloVe were early approaches that produced a single fixed vector per word. Modern embedding models, often derived from transformer encoders, produce contextual embeddings where the vector for a word or sentence depends on its surrounding context.
+
+Embeddings are the foundation of retrieval-augmented generation (RAG) systems. In a typical RAG pipeline, documents are split into chunks, each chunk is converted into an embedding vector, and these vectors are stored in a vector database. When a user submits a query, the query is also converted into an embedding, and a similarity search, commonly using cosine similarity or dot product, retrieves the most relevant chunks. These retrieved chunks are then passed to a language model as context so it can generate an answer grounded in the retrieved documents rather than relying solely on its internal parameters.
+
+Retrieval-Augmented Generation Architectures
+
+Naive RAG follows a straightforward pipeline: chunk documents, embed the chunks, store them in a vector index, retrieve the top-k most similar chunks for a given query, and feed them to a language model. While simple and effective for many use cases, naive RAG can struggle with queries that require reasoning across multiple documents or understanding relationships between entities.
+
+Graph-based RAG architectures address this limitation by building a knowledge graph from the source documents, extracting entities and the relationships between them. When a query is received, the system can traverse the graph to find related entities and facts, in addition to or instead of performing a pure vector similarity search. This allows graph RAG systems to answer more complex, multi-hop questions that require connecting information scattered across several documents. The tradeoff is typically higher latency and complexity during both the indexing phase, since entity and relationship extraction often requires additional language model calls, and the query phase, since graph traversal adds computation beyond a simple vector lookup.
+
+A Case Study: Aria Novak and Lumen Analytics
+
+Aria Novak is a data scientist and entrepreneur who founded Lumen Analytics in 2021. Lumen Analytics is a company that builds retrieval-augmented generation tools for enterprise customers, with a particular focus on combining graph-based retrieval with traditional vector search to improve answer accuracy on complex, multi-hop questions. Before founding Lumen Analytics, Aria Novak worked as a machine learning engineer at a large cloud provider, where she specialized in large-scale embedding infrastructure and vector search systems. Under her leadership, Lumen Analytics developed an internal benchmarking framework for comparing naive RAG and graph RAG pipelines across latency, retrieval accuracy, and cost metrics.
+
+Evaluating RAG Systems
+
+Evaluating a RAG system typically involves measuring both retrieval quality and generation quality. Retrieval quality metrics include precision at k, recall at k, and mean reciprocal rank (MRR), which assess whether the retrieved chunks actually contain the information needed to answer the query. Generation quality is harder to measure automatically and often relies on a combination of automated metrics, such as faithfulness and answer relevance scores, and human evaluation.
+
+Latency is another critical dimension when evaluating RAG systems in production. Total end-to-end latency is typically broken down into embedding latency, the time to convert a query into a vector; retrieval latency, the time to search the vector index or traverse a knowledge graph; and generation latency, the time for the language model to produce a response. Graph RAG systems generally introduce additional latency compared to naive RAG because of the extra steps involved in entity extraction and graph traversal, though this is often offset by improved answer quality on complex queries.
+
+Conclusion
+
+Machine learning has evolved rapidly from simple statistical models to deep neural networks and, more recently, to large transformer-based language models. Retrieval-augmented generation represents a practical way to combine the reasoning capabilities of large language models with up-to-date, verifiable information from external sources. As RAG architectures continue to evolve, the choice between naive vector-based retrieval and more sophisticated graph-based retrieval will typically depend on the complexity of the queries a system needs to support and the acceptable tradeoff between latency and answer quality.
