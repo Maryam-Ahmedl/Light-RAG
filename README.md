@@ -13,20 +13,26 @@ Originally built against OpenAI, then migrated to run on **Google Gemini** via i
 - **RAGAS evaluation**: automated scoring of faithfulness, answer relevancy, context precision, and context recall — using real questions pulled from logged usage
 
 ## Architecture
-cli.py                          Interactive CLI: ingest a file/folder, then ask questions
-LLM.py                          Thin wrapper around the OpenAI-compatible client (chat, embed, latency helpers)
-Chunking.py                     Word-based text chunker with overlap
-Extraction.py                   LLM-based entity/relationship extraction per chunk
-Ingest.py                       End-to-end ingestion: chunk → extract → embed → store
-Query.py                        Query engine implementing the four retrieval modes
-latency_tracker.py              Standalone in-memory latency tracker utility (context-manager based)
-ragas_eval.py                   Runs RAGAS metrics against the eval dataset
-storage/
-graph_store.py                NetworkX-backed knowledge graph (entities + relationships)
-Kv_store.py                   Minimal JSON key-value store (chunks, doc status)
-vector_store.py               Minimal local vector store (numpy, brute-force cosine search)
-latency_log.py                CSV-based latency logging and trend reports (used by cli.py/Query.py)
-generate_eval_dataset.py      Builds a RAGAS eval set from real logged user questions
+
+```
+Light-RAG/
+├── cli.py                        Interactive CLI: ingest a file/folder, then ask questions
+├── LLM.py                        Thin wrapper around the OpenAI-compatible client (chat, embed, latency helpers)
+├── Chunking.py                   Word-based text chunker with overlap
+├── Extraction.py                 LLM-based entity/relationship extraction per chunk
+├── Ingest.py                     End-to-end ingestion: chunk → extract → embed → store
+├── Query.py                      Query engine implementing the four retrieval modes
+├── latency_tracker.py            Standalone in-memory latency tracker utility (context-manager based)
+├── ragas_eval.py                 Runs RAGAS metrics against the eval dataset
+│
+├── storage/
+│   ├── graph_store.py            NetworkX-backed knowledge graph (entities + relationships)
+│   ├── Kv_store.py               Minimal JSON key-value store (chunks, doc status)
+│   ├── vector_store.py           Minimal local vector store (numpy, brute-force cosine search)
+│   └── latency_log.py            CSV-based latency logging and trend reports (used by cli.py/Query.py)
+│
+└──  generate_eval_Questions.py  Builds a RAGAS eval set from real logged user questions
+```
 
 
 ## Setup
