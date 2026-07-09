@@ -134,13 +134,3 @@ Prints aggregate scores and saves a per-question breakdown to `ragas_results.csv
 | `answer_relevancy` | Does the answer actually address the question asked? |
 | `context_precision` | Of the retrieved chunks, how many were relevant? |
 | `context_recall` | Did retrieval find everything needed to answer correctly? |
-
-## Notes on the Gemini migration
-
-This project runs on Gemini through its OpenAI-compatible endpoint (`https://generativelanguage.googleapis.com/v1beta/openai/`), so the standard `openai` Python SDK works with zero application code changes — only environment variables differ from a real OpenAI setup.
-
-Gemini-specific quirks handled in this codebase:
-
-- **Embedding batch limit**: capped at 100 texts per call; `LLM.py`'s `embed()` chunks internally.
-- **Embedding dimensions**: `gemini-embedding-001` defaults to 3072 dims, truncated to 768 via the `dimensions` parameter. Changing `EMBEDDING_DIM` requires deleting `storage_data/` and re-ingesting.
-- **RAGAS + Gemini embeddings**: `langchain_openai.OpenAIEmbeddings` defaults to a base64 response format Gemini's compat layer doesn't support; `ragas_eval.py` sets `check_embedding_ctx_length=False` and `encoding_format="float"` to work around this.
