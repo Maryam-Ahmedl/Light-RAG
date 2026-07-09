@@ -108,6 +108,65 @@ print(result["answer"])
 print(result["timings"])
 print(result["contexts"])   # list of raw retrieved context strings, useful for eval pipelines
 ```
+## Latency Tracking
+
+Every query and every document ingestion is automatically timed at each pipeline stage and logged to CSV for trend analysis over time — no setup needed, this happens automatically whenever you use `cli.py`.
+
+### What gets measured
+
+| Stage | What it captures |
+|---|---|
+| `embedding_seconds` | Time to embed the question into a vector |
+| `retrieval_seconds` | Time spent on vector search + graph traversal (local, no API call) |
+| `ttft_seconds` | Time To First Token — how long until the LLM starts streaming a response |
+| `llm_seconds` | Total time for the LLM to finish generating the full answer |
+| `end_to_end_seconds` | Total wall-clock time for the whole query, embedding through final answer |
+
+For ingestion, per-chunk extraction and embedding times are tracked, plus the batched entity-embedding step at the end of each document.
+
+### Viewing latency reports
+
+Latency is logged to `logs/query_latency.csv` and `logs/ingest_latency.csv`. From the interactive CLI prompt:
+report            # query latency trends: avg/min/max per stage, plus
+# whether each stage is trending up or down over time
+ingest_report     # per-document ingestion timing breakdown
+
+Example `report` output:
+#### Query Latency Report *Based on 14 queries*
+
+| Stage         | Avg (s) | Min (s) | Max (s) | Trend |
+|---------------|:-------:|:-------:|:-------:|:-----:|
+| Embedding     | 0.183   | 0.120   | 0.310   | ↓ 12.4% |
+| Retrieval     | 0.021   | 0.010   | 0.045   | → 2.1%  |
+| TTFT          | 0.402   | 0.290   | 0.610   | ↑ 18.7% |
+| LLM (total)   | 1.612   | 1.100   | 2.400   | ↑ 15.3% |
+| **End-to-End**| **1.816** | **1.230** | **2.700** | **↑ 16.1%** |
+
+> **Trend legend:** ↓ improving · → stable · ↑ increasing (relative to prior run)
+
+The trend column compares the first half vs second half of logged history, so you can catch regressions early — e.g. TTFT creeping up as the knowledge graph grows and prompts get larger.
+
+### Why this matters
+
+- **Retrieval** should almost always be tiny (pure local compute — numpy/networkx, no network). A spike here signals your vector store or graph is outgrowing brute-force search.
+- **Embedding** and **LLM** stages are network calls — these are the ones actually affected by API/provider performance.
+- **Ingestion** timing (via `ingest_report`) reveals cost and scaling risk: since one `chat()` call happens per chunk during extraction, a slow average extraction time multiplied across a large document tells you how long a new document takes to become queryable, and whether you're at risk of hitting rate limits on bigger ingests.
+
+### `latency_tracker.py`
+
+A separate, standalone in-memory latency utility (`LatencyTracker`) is also included as a lightweight alternative to the CSV-based logging above — useful for ad-hoc profiling inside a script or notebook without touching `logs/`:
+
+```python
+from latency_tracker import LatencyTracker
+tracker = LatencyTracker()
+with tracker.time_block("embedding"):
+    ...  # some code
+with tracker.time_block("llm_call"):
+    ...  # some code
+tracker.report()  # prints a formatted summary to console
+```
+This is not currently wired into `cli.py` or `Query.py` — it's a standalone tool for one-off profiling during development.
+
 
 ## Evaluation (RAGAS)
 
