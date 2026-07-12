@@ -22,7 +22,6 @@ Light-RAG/
 ├── Extraction.py                 LLM-based entity/relationship extraction per chunk
 ├── Ingest.py                     End-to-end ingestion: chunk → extract → embed → store
 ├── Query.py                      Query engine implementing the four retrieval modes
-├── latency_tracker.py            Standalone in-memory latency tracker utility (context-manager based)
 ├── ragas_eval.py                 Runs RAGAS metrics against the eval dataset
 │
 ├── storage/
@@ -151,21 +150,6 @@ The trend column compares the first half vs second half of logged history, so yo
 - **Retrieval** should almost always be tiny (pure local compute — numpy/networkx, no network). A spike here signals your vector store or graph is outgrowing brute-force search.
 - **Embedding** and **LLM** stages are network calls — these are the ones actually affected by API/provider performance.
 - **Ingestion** timing (via `ingest_report`) reveals cost and scaling risk: since one `chat()` call happens per chunk during extraction, a slow average extraction time multiplied across a large document tells you how long a new document takes to become queryable, and whether you're at risk of hitting rate limits on bigger ingests.
-
-### `latency_tracker.py`
-
-A separate, standalone in-memory latency utility (`LatencyTracker`) is also included as a lightweight alternative to the CSV-based logging above — useful for ad-hoc profiling inside a script or notebook without touching `logs/`:
-
-```python
-from latency_tracker import LatencyTracker
-tracker = LatencyTracker()
-with tracker.time_block("embedding"):
-    ...  # some code
-with tracker.time_block("llm_call"):
-    ...  # some code
-tracker.report()  # prints a formatted summary to console
-```
-This is not currently wired into `cli.py` or `Query.py` — it's a standalone tool for one-off profiling during development.
 
 
 ## Evaluation (RAGAS)
